@@ -16,10 +16,10 @@ from util.Twitter import twit
 from handler.media import reupload
 
 
-def isMultipleof10(n):
+def isMultipleof5(n):
     s = str(n)
     l = len(s)
-    if s[l - 1] == '10' or s[l - 1] == '0':
+    if s[l - 1] == '5' or s[l - 1] == '0':
         return True
     return False
 
@@ -47,9 +47,12 @@ def get_all_tweets(screen_name):
         try:
             if 'extended_entities' in tweet._json:
                 i += 1
-                if isMultipleof10(i) == True:
-                    time.sleep(10)
-                reupload(tweet)
+                if Mongo.my_tweet_collection.find_one({"reupload_tweet_id": tweet.id_str}) is None:
+                    if isMultipleof5(i) == True:
+                        time.sleep(300)
+                    reupload(tweet)
+                else:
+                    print(f"Tweet {tweet.id_str} is duplicate")
         except Exception as e:
             print(str(e))
 
