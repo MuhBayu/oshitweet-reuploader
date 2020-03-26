@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 """
 Author: https://github.com/MuhBayu
 Date: 2020-03-27
@@ -23,7 +22,6 @@ SCREEN_NAME = os.getenv('OSHI_USERNAME')
 
 
 class MyStreamListener(tweepy.StreamListener):
-    
     def __init__(self, api):
         super(MyStreamListener, self).__init__()
         self._api = api
@@ -31,10 +29,13 @@ class MyStreamListener(tweepy.StreamListener):
     def on_data(self, data):
         data = json.loads(data)
         if 'user' in data:
-            status = self._api.get_status(data['id_str'])
-            if status:
-                print(status)
-                reupload(status)
+            if data['user']['screen_name'] == str(SCREEN_NAME) and data['in_reply_to_status_id'] == None and data['in_reply_to_user_id'] == None and data['retweeted'] == False and "retweeted_status" not in data:
+                status = self._api.get_status(data['id_str'])
+                if status:
+                    print(status)
+                    reupload(status)
+            else:
+                return False
         else:
             print(data)
 
@@ -59,8 +60,8 @@ if __name__ == '__main__':
     f.write(str(os.getpid()))
     f.close()
     try:
-        myStream = tweepy.Stream(auth=twit.api.auth,
-                                 listener=MyStreamListener(twit.api))
+        myStream = tweepy.Stream(
+            auth=twit.api.auth, listener=MyStreamListener(twit.api))
         user = twit.api.get_user(screen_name=SCREEN_NAME)
         print('Service running, CTRL+C to stop')
         myStream.filter(follow=[user.id_str])
@@ -73,5 +74,3 @@ if __name__ == '__main__':
         if os.path.isfile(pidfile):
             os.unlink(pidfile)
         myStream.disconnect()
-
-			
