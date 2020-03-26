@@ -36,8 +36,6 @@ class MyStreamListener(tweepy.StreamListener):
                     reupload(status)
             else:
                 return False
-        else:
-            print(data)
 
     def on_status(self, status):
         print(status)
