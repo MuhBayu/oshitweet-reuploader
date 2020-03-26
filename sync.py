@@ -43,7 +43,7 @@ def get_all_tweets(screen_name):
 
     outtweets = []  # initialize master list to hold our ready tweets
     i = 1
-    for tweet in alltweets:
+    for tweet in reversed(alltweets):
         try:
             if 'extended_entities' in tweet._json:
                 i += 1
