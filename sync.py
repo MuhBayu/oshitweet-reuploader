@@ -15,6 +15,7 @@ from util import Mongo
 from util.Twitter import twit
 from handler.media import reupload
 
+
 def isMultipleof10(n):
     s = str(n)
     l = len(s)
@@ -32,7 +33,8 @@ def get_all_tweets(screen_name):
 
     while len(new_tweets) > 0:
         print('getting tweets before %s' % oldest)
-        new_tweets = twit.api.user_timeline(screen_name=screen_name, count=200, max_id=oldest)
+        new_tweets = twit.api.user_timeline(
+            screen_name=screen_name, count=200, max_id=oldest)
 
         alltweets.extend(new_tweets)
         oldest = alltweets[-1].id - 1
