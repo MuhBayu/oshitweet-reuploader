@@ -48,7 +48,7 @@ def get_all_tweets(screen_name):
                 if isMultipleof10(i) == True:
                     time.sleep(10)
                 reupload(twit, tweet)
-        except Exception, e:
+        except Exception as e:
             print(str(e))
 
 
