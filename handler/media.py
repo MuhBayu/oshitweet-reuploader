@@ -19,7 +19,7 @@ def reupload(tweet):
 			media_url = med['video_info']['variants'][get_index_video_url][
 				'url']
 
-		r = requests.get(media_url, allow_redirects=True, stream=True)
+		r = requests.get(media_url, allow_redirects=True)
 		fName = os.path.basename(media_url)
 		fName = fName.split('?', maxsplit=1)[0]
 		images_folder = f"./medias/{tweet.user.screen_name}"
@@ -37,10 +37,7 @@ def reupload(tweet):
 
 		media_paths.append(dir_name)
 
-		if Mongo.media_collection.find_one({
-				"id": tweet.id_str,
-				"media_url": media_url
-		}):
+		if Mongo.media_collection.find_one({"id": tweet.id_str, "media_url": media_url}):
 			print(f"Media tweet {tweet.id_str} sudah ada")
 		else:
 			data_insert = {
@@ -56,9 +53,10 @@ def reupload(tweet):
 		f.write(r.content)
 		f.close()
 
+		upload_s3 = upload_to_aws(dir_name)
 		if med['type'] == 'video':
-			video_dl = upload_to_aws(dir_name)
-
+			video_dl = upload_s3
+    
 		media_type = r.headers.get('content-type')
 		print(f"{media_url} -> {media_type}")
 
@@ -84,8 +82,17 @@ def reupload(tweet):
 				"created_at": update_status.created_at
 			}
 			Mongo.my_tweet_collection.insert_one(my_tweet_insert)
+			clear_file(media_paths)
 			return True
 		else:
+			clear_file(media_paths)
 			print("Update status gagal")
 			return False
 	return False
+
+def clear_file(paths):
+	if os.getenv('PY_ENV', 'development') == 'development':
+		return False
+	for filename in paths:
+		if os.path.exists(filename):
+			os.unlink(filename)
