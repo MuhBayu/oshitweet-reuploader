@@ -67,7 +67,7 @@ def reupload(tweet):
 	if media_paths:
 		if Mongo.my_tweet_collection.find_one({"reupload_tweet_id": tweet.id_str }):
 			print(f"{tweet.id_str} Tweet is duplicate")
-			return
+			return False
 		update_status = twit.update_status_media_upload(
 			status, media_paths, media_type)
 		if update_status is not None:
@@ -84,5 +84,8 @@ def reupload(tweet):
 				"created_at": update_status.created_at
 			}
 			Mongo.my_tweet_collection.insert_one(my_tweet_insert)
+			return True
 		else:
 			print("Update status gagal")
+			return False
+	return False
