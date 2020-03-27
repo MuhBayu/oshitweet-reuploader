@@ -34,8 +34,6 @@ class MyStreamListener(tweepy.StreamListener):
                 if status:
                     print(status)
                     reupload(status)
-            else:
-                return False
 
     def on_status(self, status):
         print(status)
@@ -46,7 +44,6 @@ class MyStreamListener(tweepy.StreamListener):
     def on_error(self, status_code):
         if status_code == 420:
             print('The App Is Being Rate Limited For Making Too Many Requests')
-            os.unlink(pidfile)
         else:
             print('Error {}n'.format(status))
         return True
@@ -58,11 +55,12 @@ if __name__ == '__main__':
     f.write(str(os.getpid()))
     f.close()
     try:
-        myStream = tweepy.Stream(
-            auth=twit.api.auth, listener=MyStreamListener(twit.api))
+        myStream = tweepy.Stream(auth=twit.api.auth, listener=MyStreamListener(twit.api))
         user = twit.api.get_user(screen_name=SCREEN_NAME)
         print('Service running, CTRL+C to stop')
         myStream.filter(follow=[user.id_str])
+    except tweepy.RateLimitError as re:
+        print(str(re))
     except Exception as e:
         print(str(e))
     except KeyboardInterrupt:
