@@ -4,11 +4,13 @@ import json
 from util import Mongo
 from util.Twitter import twit
 from util.s3 import upload_to_aws
+from datetime import datetime
 
 
 def reupload(tweet):
 	media_paths = []
 	status = f"from Twitter ({tweet.created_at})"
+	year_and_month = tweet.created_at.strftime("%Y/%b")
 	video_dl = ''
 	for med in tweet._json['extended_entities']['media']:
 		if med['type'] == 'photo':
@@ -53,7 +55,7 @@ def reupload(tweet):
 		f.write(r.content)
 		f.close()
 
-		upload_s3 = upload_to_aws(dir_name)
+		upload_s3 = upload_to_aws(dir_name, year_and_month)
 		if med['type'] == 'video':
 			video_dl = upload_s3
     
