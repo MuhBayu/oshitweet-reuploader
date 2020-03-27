@@ -12,14 +12,19 @@ def reupload(tweet):
 	status = f"from Twitter ({tweet.created_at})"
 	year_and_month = tweet.created_at.strftime("%Y/%b")
 	video_dl = ''
+
+	def biggest_bitrate(variants):
+		bitrate = []
+		for v in variants['variants']:
+			bitrate.append(v['bitrate'] if "bitrate" in v else 0)
+		index = bitrate.index(max(bitrate)) if len(bitrate) > 0 else -1
+		return variants['variants'][index]['url']
+
 	for med in tweet._json['extended_entities']['media']:
 		if med['type'] == 'photo':
 			media_url = med['media_url']
 		else:
-			get_index_video_url = -1 if med['video_info']['variants'][-1][
-				'content_type'] == 'video/mp4' else -2
-			media_url = med['video_info']['variants'][get_index_video_url][
-				'url']
+			media_url = biggest_bitrate(med['video_info'])
 
 		r = requests.get(media_url, allow_redirects=True)
 		fName = os.path.basename(media_url)
