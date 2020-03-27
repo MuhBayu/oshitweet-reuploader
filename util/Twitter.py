@@ -1,3 +1,4 @@
+import sys
 import os
 import time
 import tweepy
@@ -50,6 +51,7 @@ class Twitter:
             update = videoTweet.tweet(status)
             return self.api.get_status(update['id_str'])
         except Exception as e:
+            print(str(e))
             return None
 
     @property
@@ -122,7 +124,7 @@ class VideoTweet(object):
             if req.status_code < 200 or req.status_code > 299:
                 print(req.status_code)
                 print(req.text)
-                sys.exit(0)
+                # sys.exit(0)
 
             segment_id = segment_id + 1
             bytes_sent = file.tell()
@@ -162,7 +164,8 @@ class VideoTweet(object):
             return
 
         if state == u'failed':
-            sys.exit(0)
+            # sys.exit(0)
+            pass
 
         check_after_secs = self.processing_info['check_after_secs']
 
@@ -190,6 +193,10 @@ class VideoTweet(object):
 
         req = requests.post(
             url=self.POST_TWEET_URL, data=request_data, auth=self.oauth)
+        print("------- TWEET VIDEO LOG -------")
+        print(self.video_filename)
+        print(req.json())
+        print("----------------------------------")
         return req.json()
 
 
