@@ -14,5 +14,6 @@ TWIT_ACCESS_TOKEN_SECRET = os.getenv('ACCESS_TOKEN_SECRET')
 
 SCREEN_NAME = os.getenv('OSHI_USERNAME')
 
-status = twit.api.get_status('1235829307554988032')
-reupload(status)
+status = twit.api.get_status('1151838394000916480')
+if "extended_entities" in status._json:
+    reupload(status)
