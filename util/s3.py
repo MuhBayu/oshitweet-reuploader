@@ -6,10 +6,10 @@ ACCESS_KEY = os.getenv('S3_ACCESS_KEY')
 SECRET_KEY = os.getenv('S3_SECRET_KEY')
 BUCKET_NAME = os.getenv('S3_BUCKET')
 
-def upload_to_aws(local_file):
+def upload_to_aws(local_file, folder_name):
     s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
     try:
-        key_name = os.path.basename(local_file)
+        key_name = f"{folder_name}/{os.path.basename(local_file)}"
         local_path = os.path.abspath(local_file)
         s3.upload_file(local_path, BUCKET_NAME, key_name)
         s3.put_object_acl(ACL='public-read', Bucket=BUCKET_NAME, Key=key_name)
