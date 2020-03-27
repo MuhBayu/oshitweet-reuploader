@@ -46,11 +46,12 @@ def get_all_tweets(screen_name):
     for tweet in reversed(alltweets):
         try:
             if 'extended_entities' in tweet._json:
-                i += 1
                 if Mongo.my_tweet_collection.find_one({"reupload_tweet_id": tweet.id_str}) is None:
-                    if isMultipleof5(i) == True:
-                        time.sleep(300)
-                    reupload(tweet)
+                    share = reupload(tweet)
+                    if share:
+                        i += 1
+                        if isMultipleof5(i) == True:
+                            time.sleep(300)
                 else:
                     print(f"Tweet {tweet.id_str} is duplicate")
         except Exception as e:
