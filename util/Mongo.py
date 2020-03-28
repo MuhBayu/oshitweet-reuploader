@@ -1,4 +1,5 @@
-  
+from dotenv import load_dotenv
+load_dotenv()
 import os
 from pymongo import MongoClient
 # Connect to the MongoDB, change the connection string per your MongoDB environment
