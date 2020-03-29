@@ -33,7 +33,8 @@ class MyStreamListener(tweepy.StreamListener):
                 status = self._api.get_status(data['id_str'])
                 if status:
                     print(status)
-                    reupload(status)
+                    if "extended_entities" in status._json:
+                        reupload(status)
 
     def on_status(self, status):
         print(status)
