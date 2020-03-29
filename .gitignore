@@ -133,5 +133,8 @@ dmypy.json
 .pyre/
 .pid
 
-medias/
-images/
+medias/**/*.jpg
+medias/**/*.png
+medias/**/*.jpeg
+medias/**/*.mp4
+!/**/.gitkeep
