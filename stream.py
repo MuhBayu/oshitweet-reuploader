@@ -29,7 +29,7 @@ class MyStreamListener(tweepy.StreamListener):
     def on_data(self, data):
         data = json.loads(data)
         if 'user' in data:
-            if data['user']['screen_name'] == SCREEN_NAME and data['retweeted'] == False and "retweeted_status" not in data:
+            if data['user']['screen_name'] == SCREEN_NAME:
                 status = self._api.get_status(data['id_str'])
                 if status:
                     print(status)
