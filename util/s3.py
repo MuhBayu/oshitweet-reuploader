@@ -6,6 +6,7 @@ ACCESS_KEY = os.getenv('S3_ACCESS_KEY')
 SECRET_KEY = os.getenv('S3_SECRET_KEY')
 BUCKET_NAME = os.getenv('S3_BUCKET')
 
+
 def upload_to_aws(local_file, folder_name):
     s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
     try:
