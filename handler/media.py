@@ -6,11 +6,10 @@ from util.Twitter import twit
 from util.s3 import upload_to_aws
 from datetime import datetime
 
-SCREEN_NAME = os.getenv('OSHI_USERNAME')
 
 def reupload(tweet):
 	media_paths = []
-	caption = f"from Twitter ({tweet.created_at})\n\nhttps://twitter.com/{SCREEN_NAME}/status/{tweet.id_str}"
+	caption = f"from Twitter ({tweet.created_at})\n\nhttps://twitter.com/{tweet.screen_name}/status/{tweet.id_str}"
 	year_and_month = tweet.created_at.strftime("%Y/%b")
 	video_dl = ''
 
