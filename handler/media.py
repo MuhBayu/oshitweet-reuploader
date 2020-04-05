@@ -6,10 +6,11 @@ from util.Twitter import twit
 from util.s3 import upload_to_aws
 from datetime import datetime
 
+SCREEN_NAME = os.getenv('OSHI_USERNAME')
 
 def reupload(tweet):
 	media_paths = []
-	status = f"from Twitter ({tweet.created_at})"
+	caption = f"from Twitter ({tweet.created_at})\n\nhttps://twitter.com/{SCREEN_NAME}/status/{tweet.id_str}"
 	year_and_month = tweet.created_at.strftime("%Y/%b")
 	video_dl = ''
 
@@ -74,7 +75,7 @@ def reupload(tweet):
 			print(f"{tweet.id_str} Tweet is duplicate")
 			return False
 		update_status = twit.update_status_media_upload(
-			status, media_paths, media_type)
+			caption, media_paths, media_type)
 		if update_status is not None:
 			if video_dl:
 				twit.api.update_status(
@@ -84,7 +85,7 @@ def reupload(tweet):
 			my_tweet_insert = {
 				"id": update_status.id_str,
 				"reupload_tweet_id": tweet.id_str,
-				"text": status,
+				"text": caption,
 				"media_paths": json.dumps(media_paths),
 				"created_at": update_status.created_at
 			}
