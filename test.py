@@ -16,12 +16,14 @@ SCREEN_NAME = os.getenv('OSHI_USERNAME')
 
 
 if __name__ == "__main__":
-    arg_names = ['command', 'tweet_id']
+    arg_names = ['command', 'tweet_id', 'debug']
     args = dict(zip(arg_names, sys.argv))
     tweet_id = args.get('tweet_id')
     if tweet_id is None:
         print("Please input tweet_id")
         sys.exit(0)
     status = twit.api.get_status(tweet_id)
+    if args.get('debug'):
+        print(status)
     if "extended_entities" in status._json:
         reupload(status)
