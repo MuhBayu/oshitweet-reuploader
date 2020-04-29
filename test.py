@@ -24,6 +24,6 @@ if __name__ == "__main__":
         sys.exit(0)
     status = twit.api.get_status(tweet_id)
     if args.get('debug'):
-        print(status)
+        print(status._json)
     if "extended_entities" in status._json:
         reupload(status)
