@@ -1,4 +1,4 @@
-# fiony re-uploader
+# oshitweet re-uploader
 🦒 A Twitter bot as a media reuploader as a backup.
 
 ### How does this work?
