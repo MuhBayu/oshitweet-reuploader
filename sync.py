@@ -27,21 +27,20 @@ def isMultipleof5(n):
 def get_all_tweets(screen_name):
     user = twit.api.get_user(screen_name=screen_name)
     alltweets = []
-    new_tweets = twit.api.user_timeline(screen_name=screen_name, count=1)
+    new_tweets = twit.api.user_timeline(screen_name=screen_name, count=1, tweet_mode="extended")
     alltweets.extend(new_tweets)
     oldest = alltweets[-1].id - 1
 
     while len(new_tweets) > 0:
         print('getting tweets before %s' % oldest)
         new_tweets = twit.api.user_timeline(
-            screen_name=screen_name, count=200, max_id=oldest)
+            screen_name=screen_name, count=1000, max_id=oldest, tweet_mode="extended")
 
         alltweets.extend(new_tweets)
         oldest = alltweets[-1].id - 1
 
         print('...%s tweets downloaded so far' % len(alltweets))
 
-    outtweets = []  # initialize master list to hold our ready tweets
     i = 1
     for tweet in reversed(alltweets):
         try:

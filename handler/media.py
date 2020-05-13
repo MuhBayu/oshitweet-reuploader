@@ -21,18 +21,14 @@ def reupload(tweet):
 		return variants['variants'][index]['url']
 
 	for med in tweet._json['extended_entities']['media']:
-		if med['type'] == 'photo':
-			media_url = med['media_url']
-		else:
-			media_url = biggest_bitrate(med['video_info'])
+		media_url = med['media_url'] if med['type'] == 'photo' else biggest_bitrate(med['video_info'])
 
-		r = requests.get(media_url, allow_redirects=True)
 		fName = os.path.basename(media_url)
 		fName = fName.split('?', maxsplit=1)[0]
-		images_folder = f"./medias/{tweet.user.screen_name}"
+		images_folder = f"./medias/{tweet.user.screen_name}/{year_and_month}"
 
 		if not os.path.exists(images_folder):
-			os.mkdir(images_folder)
+			os.makedirs(images_folder)
 
 		if len(tweet._json['extended_entities']['media']) > 1:
 			folder_dir = '{}/{}'.format(images_folder, tweet.id_str)
@@ -56,18 +52,20 @@ def reupload(tweet):
 			}
 			Mongo.media_collection.insert_one(data_insert)
 
-		f = open(dir_name, 'wb')
-		f.write(r.content)
-		f.close()
-
-		upload_s3 = upload_to_aws(dir_name, year_and_month)
-		if med['type'] == 'video':
-			video_dl = upload_s3
-    
-		media_type = r.headers.get('content-type')
-		print(f"{media_url} -> {media_type}")
-
-		del r
+		media_type = None
+		if not os.path.exists(dir_name):
+			r = requests.get(media_url, allow_redirects=True)
+			media_type = r.headers.get('content-type')
+			f = open(dir_name, 'wb')
+			f.write(r.content)
+			f.close()
+			del r
+			print(f">> [{tweet.id_str}] {media_url} ({media_type}) -> DOWNLOADED")
+			upload_s3 = upload_to_aws(dir_name, year_and_month)
+			if med['type'] == 'video':
+				video_dl = upload_s3
+		else:
+			print(f"[{tweet.id_str}] {media_url} -> SKIPPED")
 
 	if media_paths:
 		if Mongo.my_tweet_collection.find_one({"reupload_tweet_id": tweet.id_str }):
@@ -89,15 +87,15 @@ def reupload(tweet):
 				"created_at": update_status.created_at
 			}
 			Mongo.my_tweet_collection.insert_one(my_tweet_insert)
-			clear_file(media_paths)
+			clean_file(media_paths)
 			return True
 		else:
-			clear_file(media_paths)
+			clean_file(media_paths)
 			print("Update status gagal")
 			return False
 	return False
 
-def clear_file(paths):
+def clean_file(paths):
 	if os.getenv('PY_ENV', 'development') == 'development':
 		return False
 	for filename in paths:
