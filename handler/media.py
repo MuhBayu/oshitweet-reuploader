@@ -30,6 +30,7 @@ def reupload(tweet):
 
 	for med in tweetJson['extended_entities']['media']:
 		media_url = med['media_url'] if med['type'] == 'photo' else biggest_bitrate(med['video_info'])
+		thumbnail = med['media_url_https']
 
 		fName = os.path.basename(media_url)
 		fName = fName.split('?', maxsplit=1)[0]
@@ -54,6 +55,7 @@ def reupload(tweet):
 			data_insert = {
 				"id": tweet.id_str,
 				"media_url": media_url,
+				"thumbnail": thumbnail,
 				"media_type": med['type'],
 				"media_path": dir_name,
 				"created_at": tweet.created_at,
