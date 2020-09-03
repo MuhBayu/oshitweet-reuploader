@@ -5,13 +5,15 @@ from util import Mongo
 from util.Twitter import twit
 from util.s3 import upload_to_aws
 from datetime import datetime
-
+import mimetypes
 
 def reupload(tweet):
 	media_paths = []
 	caption = f"from Twitter ({tweet.created_at})\n\nhttps://twitter.com/{tweet.author.screen_name}/status/{tweet.id_str}"
 	year_and_month = tweet.created_at.strftime("%Y/%b")
 	video_dl = ''
+	tweetJson = tweet._json
+	is_tgif = False
 
 	def biggest_bitrate(variants):
 		bitrate = []
@@ -20,7 +22,13 @@ def reupload(tweet):
 		index = bitrate.index(max(bitrate)) if len(bitrate) > 0 else -1
 		return variants['variants'][index]['url']
 
-	for med in tweet._json['extended_entities']['media']:
+	if "entities" in tweetJson:
+		if "hashtags" in tweetJson['entities']:
+			for h in tweetJson['entities']['hashtags']:
+				if h['text'] == 'TGIF':
+					is_tgif = True
+
+	for med in tweetJson['extended_entities']['media']:
 		media_url = med['media_url'] if med['type'] == 'photo' else biggest_bitrate(med['video_info'])
 
 		fName = os.path.basename(media_url)
@@ -30,7 +38,7 @@ def reupload(tweet):
 		if not os.path.exists(images_folder):
 			os.makedirs(images_folder)
 
-		if len(tweet._json['extended_entities']['media']) > 1:
+		if len(tweetJson['extended_entities']['media']) > 1:
 			folder_dir = '{}/{}'.format(images_folder, tweet.id_str)
 			if not os.path.exists(folder_dir):
 				os.mkdir(folder_dir)
@@ -48,7 +56,8 @@ def reupload(tweet):
 				"media_url": media_url,
 				"media_type": med['type'],
 				"media_path": dir_name,
-				"created_at": tweet.created_at
+				"created_at": tweet.created_at,
+				"is_tgif": is_tgif
 			}
 			Mongo.media_collection.insert_one(data_insert)
 
@@ -61,11 +70,13 @@ def reupload(tweet):
 			f.close()
 			del r
 			print(f">> [{tweet.id_str}] {media_url} ({media_type}) -> DOWNLOADED")
-			upload_s3 = upload_to_aws(dir_name, year_and_month)
-			if med['type'] == 'video':
-				video_dl = upload_s3
 		else:
-			print(f"[{tweet.id_str}] {media_url} -> SKIPPED")
+			media_type = mimetypes.MimeTypes().guess_type(dir_name)[0]	
+			print(f"[{tweet.id_str}] {media_url} ({media_type}) -> SKIPPED")
+
+		upload_s3 = upload_to_aws(dir_name, year_and_month)
+		if med['type'] == 'video':
+			video_dl = upload_s3
 
 	if media_paths:
 		if Mongo.my_tweet_collection.find_one({"reupload_tweet_id": tweet.id_str }):
