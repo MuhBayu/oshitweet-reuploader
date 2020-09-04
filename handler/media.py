@@ -54,6 +54,7 @@ def reupload(tweet):
 		else:
 			data_insert = {
 				"id": tweet.id_str,
+				"text": tweetJson['full_text'],
 				"media_url": media_url,
 				"thumbnail": thumbnail,
 				"media_type": med['type'],
