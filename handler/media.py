@@ -15,6 +15,11 @@ def reupload(tweet):
 	tweetJson = tweet._json
 	is_tgif = False
 
+	if "text" in tweetJson:
+		text = tweetJson['text']
+	elif "full_text" in tweetJson:
+		text = tweetJson['full_text']
+
 	def biggest_bitrate(variants):
 		bitrate = []
 		for v in variants['variants']:
@@ -54,7 +59,7 @@ def reupload(tweet):
 		else:
 			data_insert = {
 				"id": tweet.id_str,
-				"text": tweetJson['text'],
+				"text": text,
 				"media_url": media_url,
 				"thumbnail": thumbnail,
 				"media_type": med['type'],

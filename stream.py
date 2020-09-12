@@ -30,7 +30,7 @@ class MyStreamListener(tweepy.StreamListener):
         data = json.loads(data)
         if 'user' in data:
             if data['user']['screen_name'] == SCREEN_NAME:
-                status = self._api.get_status(data['id_str'])
+                status = self._api.get_status(data['id_str'], include_entities=True, tweet_mode="extended")
                 if status:
                     print(status)
                     if "extended_entities" in status._json:
